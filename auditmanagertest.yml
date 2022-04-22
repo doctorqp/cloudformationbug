@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS Audit Manager bug report template
+Parameters:
+  DestinationBucket:
+    Description: Give destination S3 bucket name for the report
+    Type: String
+  RoleArn:
+    Description: Give IAM role Arn you want to grant permission to
+    Type: String
+  AssessmentStatus:
+    Description: TEST parameter for reported bug Select ACTIVE for the status of assessment to be ACTIVE else select INACTIVE for status of assessment to be INACTIVE.
+    Type: String
+    AllowedValues:
+      - ACTIVE
+      - INACTIVE
+Resources:
+  Assessment:
+    Type: AWS::AuditManager::Assessment
+    Properties: 
+      AssessmentReportsDestination: 
+        Destination: !Sub 's3://${DestinationBucket}/'
+        DestinationType: S3
+      AwsAccount: 
+        Id: !Ref AWS::AccountId
+      Description: 'test assessment'
+      FrameworkId: '2ad0cca9-a1bf-3b4a-9769-ef78c51902ba'
+      Name: 'testassessment'
+      Roles: 
+        - 
+          RoleArn: !Ref RoleArn
+          RoleType: PROCESS_OWNER        
+      Scope: 
+        AwsAccounts:
+          - 
+            Id: !Ref AWS::AccountId     
+        AwsServices:
+          - ServiceName: cloudtrail
+          - ServiceName: iam
+          - ServiceName: ec2
+      Status: !Ref AssessmentStatus
